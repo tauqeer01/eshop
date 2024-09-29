@@ -10,6 +10,9 @@ public interface IBaseRepo<T> where T : BaseEntities
     Task<IReadOnlyList<T>> GetAllAsync();
     Task<T?> GetEntityWithSpec(ISpecifications<T> spec);
     Task<IReadOnlyList<T>> ListAsync(ISpecifications<T> spec);
+
+    Task<TResult?> GetEntityWithSpec<TResult>(ISpecifications<T, TResult> spec);
+    Task<IReadOnlyList<TResult>> ListAsync<TResult>(ISpecifications<T, TResult> spec);
     void Add(T entity);
     void Update(T entity);
     void Remove(T entity);

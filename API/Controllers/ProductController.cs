@@ -62,13 +62,16 @@ namespace API.Controllers
         [HttpGet("brand")]
         public async Task<ActionResult<IReadOnlyList<Product>>> GetBrands()
         {
-            return Ok();
+            var spec = new BrandListSpec();
+            return Ok(await repo.ListAsync(spec));
         }
 
         [HttpGet("types")]
         public async Task<ActionResult<IReadOnlyList<Product>>> GetTypes()
         {
-            return Ok();
+            var spec = new TypesListSpecification();
+            return Ok(await repo.ListAsync(spec));
+
         }
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteProduct(int id)

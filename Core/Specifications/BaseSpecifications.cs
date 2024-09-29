@@ -10,6 +10,9 @@ public class BaseSpecifications<T>(Expression<Func<T, bool>>? criteria) : ISpeci
     public Expression<Func<T, bool>>? Criteria => criteria;
     public Expression<Func<T, object>>? OrderBy { get; private set; }
     public Expression<Func<T, object>>? OrderByDescending { get; private set; }
+
+    public bool IsDistinct { get; private set; }
+
     protected void AddOrderBy(Expression<Func<T, object>> orderByExpression)
     {
         OrderBy = orderByExpression;
@@ -17,5 +20,20 @@ public class BaseSpecifications<T>(Expression<Func<T, bool>>? criteria) : ISpeci
     protected void AddOrderByDescending(Expression<Func<T, object>> orderByDescExpression)
     {
         OrderByDescending = orderByDescExpression;
+    }
+
+    protected void ApplyDistinct()
+    {
+        IsDistinct = true;
+    }
+}
+
+public class BaseSpecifications<T, TResult>(Expression<Func<T, bool>>? criteria) : BaseSpecifications<T>(criteria), ISpecifications<T, TResult>
+{
+      protected BaseSpecifications() : this(null) { }
+    public Expression<Func<T, TResult>>? Select { get; private set; }
+    protected void AddSelect(Expression<Func<T, TResult>> selectorExpression)
+    {
+        Select = selectorExpression;
     }
 }
