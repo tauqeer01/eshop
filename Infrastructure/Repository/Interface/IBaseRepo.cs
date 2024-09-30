@@ -18,4 +18,5 @@ public interface IBaseRepo<T> where T : BaseEntities
     void Remove(T entity);
     Task<bool> SaveAllAsync();
     bool Exists(int id);
+    Task<int> CountAsync(ISpecifications<T> spec);
 }
