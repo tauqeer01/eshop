@@ -1,0 +1,22 @@
+<div class="container mt-5 p-4 bg-gray-100 shadow-lg">
+    <h1 class="text-3xl font-semibold mb-4">Internal Server Error</h1>
+    @if(error){
+        <h5 class="text-red-500"> Error: {{error.message}}</h5>
+        <p class="font-bold mb-2">This is internal server error  </p>
+        <p class="mb-2">What to do next</p>
+        <ol>
+            <li>Open chrome dev tools</li>
+            <li>Inspect network tab</li>
+            <li>Check the failing request</li>
+            <li>Examine the request URL - make sure it is correct</li>
+            <li>Reproduce the error in Postman - if we see the same response, then the issue is not with Angular</li>
+        </ol>
+        <h5>Stack trace</h5>
+        <mat-card class="p-4 bg-white">
+           <code class="block whitespace-pre-wrap">
+            {{error.details}}
+           </code>>
+        </mat-card>
+       
+    }
+</div>
