@@ -14,19 +14,23 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddControllers();
 builder.Services.AddScoped(typeof(IBaseRepo<>), typeof(BaseRepo<>));
 builder.Services.AddCors();
+
 builder.Services.AddSingleton<IConnectionMultiplexer>(c =>{
     var conString = builder.Configuration.GetConnectionString("Redis")
     ?? throw new Exception("Redis Connection string not found");
     var configuration = ConfigurationOptions.Parse(conString,true);
     return ConnectionMultiplexer.Connect(configuration);
 });
+
 builder.Services.AddSingleton<ICartService, CartService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseCors(options => options.AllowAnyOrigin()
+    .AllowAnyMethod()
+    .AllowAnyHeader()
+    .WithExposedHeaders("Content-Type"));
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseCors(options => options.AllowAnyOrigin().AllowAnyMethod()
-.WithOrigins("http://localhost:4200", "https://localhost:4200"));
 
 app.MapControllers();
 
