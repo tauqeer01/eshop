@@ -15,7 +15,20 @@ export class CartService {
   itemCount = computed(() => {
     return this.cart()?.items.reduce((sum, item) => sum + item.quantity, 0);
   })
-
+totals = computed(() =>{
+  const cart = this.cart();
+  if(!cart) return null;
+  const subtotals = cart.items.reduce((sum, item) => sum + item.quantity * item.price, 0);
+  const shipping = 0;
+  const discount = 0;
+  const total = subtotals + shipping - discount;
+  return {
+    subtotals,
+    shipping,
+    discount,
+    total
+  }
+})
   // get cart
   getCart(id: string) {
     return this.http.get<Cart>(this.baseUrl + 'cart?id=' + id).pipe(
@@ -24,8 +37,6 @@ export class CartService {
         return cart
       })
     )
-      
-    
   }
 
   // update cart
@@ -55,6 +66,34 @@ export class CartService {
       items[index].quantity += quantity;
     }
     return items;
+  }
+
+  // remove item from cart
+  removeItemFromCart(productId: number, quantity =1) {
+   const cart = this.cart();
+   if(!cart) return;
+   const index = cart.items.findIndex(i => i.productId === productId);
+   if(index !== -1){
+    if(cart.items[index].quantity > quantity){
+      cart.items[index].quantity -= quantity;
+    } else {
+      cart.items.splice(index, 1);
+    }
+    if(cart.items.length === 0){
+      this.deleteCart();
+    }
+    else{
+      this.setCart(cart);
+    }
+   }
+  }
+  deleteCart() {
+    this.http.delete(this.baseUrl + 'cart?id=' + this.cart()?.id).subscribe({
+      next: () =>{
+        localStorage.removeItem('cart_id');
+        this.cart.set(null);
+      }
+    })
   }
 
   private mapProductItemToCartItem(item: Product): CartItem {
