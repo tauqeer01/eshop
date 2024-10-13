@@ -14,18 +14,19 @@ public class AppDbContext : IdentityDbContext<AppUser>
     }
     public DbSet<Product> Products { get; set; }
     public DbSet<Address> Addresses { get; set; }
+    public DbSet<DeliveryMethod> DeliveryMethods { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
         // change default identity table 
-            modelBuilder.Entity<AppUser>().ToTable("Members");
-            modelBuilder.Entity<IdentityRole>().ToTable("Roles");
-            modelBuilder.Entity<IdentityUserRole<string>>().ToTable("UserRoles");
-            modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims");
-            modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
-            modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims");
-            modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ProductConfigurations).Assembly);
+        modelBuilder.Entity<AppUser>().ToTable("Members");
+        modelBuilder.Entity<IdentityRole>().ToTable("Roles");
+        modelBuilder.Entity<IdentityUserRole<string>>().ToTable("UserRoles");
+        modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("UserClaims");
+        modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("UserLogins");
+        modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("RoleClaims");
+        modelBuilder.Entity<IdentityUserToken<string>>().ToTable("UserTokens");
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ProductConfigurations).Assembly);
     }
 }

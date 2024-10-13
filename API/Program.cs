@@ -1,5 +1,6 @@
 using API.Middleware;
 using Core.Entities;
+using Core.Interface;
 using Infrastructure.Data;
 using Infrastructure.Repository;
 using Infrastructure.Repository.Interface;
@@ -16,19 +17,21 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddControllers();
 builder.Services.AddScoped(typeof(IBaseRepo<>), typeof(BaseRepo<>));
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddCors();
 
-builder.Services.AddSingleton<IConnectionMultiplexer>(c =>{
+builder.Services.AddSingleton<IConnectionMultiplexer>(c =>
+{
     var conString = builder.Configuration.GetConnectionString("Redis")
     ?? throw new Exception("Redis Connection string not found");
-    var configuration = ConfigurationOptions.Parse(conString,true);
+    var configuration = ConfigurationOptions.Parse(conString, true);
     return ConnectionMultiplexer.Connect(configuration);
 });
 
 builder.Services.AddSingleton<ICartService, CartService>();
 
-builder.Services.AddAuthorization();    
-builder.Services.AddIdentityApiEndpoints<AppUser>().AddEntityFrameworkStores<AppDbContext>();  
+builder.Services.AddAuthorization();
+builder.Services.AddIdentityApiEndpoints<AppUser>().AddEntityFrameworkStores<AppDbContext>();
 builder.Services.ConfigureApplicationCookie(options =>
 {
     options.Cookie.HttpOnly = true;
@@ -41,8 +44,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 
 app.UseMiddleware<ExceptionMiddleware>();
-app.UseCors(x =>x.AllowAnyHeader().AllowAnyMethod().AllowCredentials()
-   .WithOrigins("http://localhost:4200","https://localhost:4200"));
+app.UseCors(x => x.AllowAnyHeader().AllowAnyMethod().AllowCredentials()
+   .WithOrigins("http://localhost:4200", "https://localhost:4200"));
 app.MapControllers();
 app.MapGroup("api").MapIdentityApi<AppUser>();
 try
@@ -52,7 +55,7 @@ try
         var services = scope.ServiceProvider;
         var context = services.GetRequiredService<AppDbContext>();
         context.Database.Migrate();
-        await SeedData.SeedAysnc(context);
+        await SeedData.SeedAsync(context);
     }
 }
 catch (Exception ex)
