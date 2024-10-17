@@ -1,10 +1,19 @@
 
 <div class="flex mt-32 gap-6">
     <div class="w-3/4">
-       <mat-stepper #stepper class="bg-white border border-gray-200 shadow-sm">
+       <mat-stepper 
+       (selectionChange)="onStepChange($event)"
+       #stepper
+        class="bg-white border border-gray-200 shadow-sm">
         <mat-step label="Address">
-           <div id="address-element">
-              
+           <div id="address-element"></div>
+           <div class="flex justify-end mt-1">
+            <mat-checkbox 
+            [checked]="saveAddress"
+            (change)="onSaveAddressCheckBoxChange($event)"
+            >
+            Save as default Address
+            </mat-checkbox>
            </div>
            <div class="flex justify-between mt-6">
              <button routerLink="/shop" mat-stroked-button>Continue shopping</button>
@@ -12,7 +21,11 @@
            </div>
         </mat-step>
         <mat-step label="Shipping">
-          Delivery form
+          <app-checkout-delivery></app-checkout-delivery>
+          <div class="flex justify-between mt-6">
+            <button matStepperPrevious mat-stroked-button>Back</button>
+            <button matStepperNext mat-flat-button>Next</button>
+          </div>
         </mat-step>
         <mat-step label="Payment">
             Payment form
