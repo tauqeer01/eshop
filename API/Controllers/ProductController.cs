@@ -11,19 +11,19 @@ using Microsoft.EntityFrameworkCore;
 namespace API.Controllers
 {
 
-    public class ProductController(IBaseRepo<Product> repo) : BaseApiController
+    public class ProductController(IUnitOfWork unit) : BaseApiController
     {
         [HttpGet]
         public async Task<ActionResult<IReadOnlyList<Product>>> GetProducts([FromQuery] ProductSpecParams specParams)
         {
             var spec = new ProductSpecification(specParams);
-            return await CreatedPageResult(repo, spec, specParams.PageIndex, specParams.PageSize);
+            return await CreatedPageResult(unit.BaseRepo<Product>(), spec, specParams.PageIndex, specParams.PageSize);
         }
 
         [HttpGet("{id:int}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product = await repo.GetByIdAsync(id);
+            var product = await unit.BaseRepo<Product>().GetByIdAsync(id);
 
             if (product == null) return NotFound();
             return product;
@@ -32,8 +32,8 @@ namespace API.Controllers
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct(Product product)
         {
-            repo.Add(product);
-            await repo.SaveAllAsync();
+            unit.BaseRepo<Product>().Add(product);
+            await unit.BaseRepo<Product>().SaveAllAsync();
             return CreatedAtAction("GetProduct", new { id = product.Id }, product);
         }
 
@@ -42,11 +42,11 @@ namespace API.Controllers
         {
             if (id != product.Id) return BadRequest();
 
-            repo.Update(product);
+            unit.BaseRepo<Product>().Update(product);
 
             try
             {
-                await repo.SaveAllAsync();
+                await unit.Complete();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -61,31 +61,31 @@ namespace API.Controllers
         public async Task<ActionResult<IReadOnlyList<Product>>> GetBrands()
         {
             var spec = new BrandListSpec();
-            return Ok(await repo.ListAsync(spec));
+            return Ok(await unit.BaseRepo<Product>().ListAsync(spec));
         }
 
         [HttpGet("types")]
         public async Task<ActionResult<IReadOnlyList<Product>>> GetTypes()
         {
             var spec = new TypesListSpecification();
-            return Ok(await repo.ListAsync(spec));
+            return Ok(await unit.BaseRepo<Product>().ListAsync(spec));
 
         }
         [HttpDelete("{id:int}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = await repo.GetByIdAsync(id);
+            var product = await unit.BaseRepo<Product>().GetByIdAsync(id);
             if (product == null) return NotFound();
 
-            repo.Remove(product);
-            await repo.SaveAllAsync();
+            unit.BaseRepo<Product>().Remove(product);
+            await unit.BaseRepo<Product>().SaveAllAsync();
 
             return NoContent();
         }
 
         private bool ProductExists(int id)
         {
-            return repo.Exists(id);
+            return unit.BaseRepo<Product>().Exists(id);
         }
     }
 }
