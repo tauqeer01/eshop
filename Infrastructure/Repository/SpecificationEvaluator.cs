@@ -2,6 +2,7 @@ using System;
 using Core.Entities;
 using Core.Interface;
 using Infrastructure.Repository.Interface;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repository;
 
@@ -31,6 +32,8 @@ public class SpecificationEvaluator<T> where T : BaseEntities
         {
             query = query.Skip(spec.Skip).Take(spec.Take);
         }
+        query = spec.Includes.Aggregate(query, (current, include) => current.Include(include));
+        query = spec.IncludeStrings.Aggregate(query, (current, include) => current.Include(include));
         return query;
     }
 

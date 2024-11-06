@@ -3,6 +3,7 @@ using API.Extentions;
 using Core.Dtos;
 using Core.Entities;
 using Core.Entities.OrderAggregate;
+using Core.Specifications;
 using Infrastructure.Repository.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -60,5 +61,21 @@ public class OrdersController(IUnitOfWork unit, ICartService cartService) : Base
             return order;
         }
         return BadRequest("Problem creating order");
+    }
+
+    [HttpGet]
+    public async Task<ActionResult<IReadOnlyList<OrderDto>>> GetOrdersForUser(){
+        var spec = new OrderSpecifications(User.GetEmail());
+        var orders = await unit.BaseRepo<Order>().ListAsync(spec);
+        var ordersToReturn = orders.Select(order => order.ToDto()).ToList();
+        return Ok(ordersToReturn);
+    }
+
+    [HttpGet("{id:int}")]
+    public async Task<ActionResult<OrderDto>> GetOrder(int id){
+        var spec = new OrderSpecifications(User.GetEmail(),id );
+        var order = await unit.BaseRepo<Order>().GetEntityWithSpec(spec);
+        if(order == null) return NotFound();
+        return order.ToDto();
     }
 }

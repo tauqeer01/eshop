@@ -7,5 +7,5 @@ public class AppUser : IdentityUser
 {
    public string FistName { get; set; }= string.Empty;
    public string LastName { get; set; }= string.Empty;
-  public Address? Address { get; set; }
+   public Address? Address { get; set; }
 }
